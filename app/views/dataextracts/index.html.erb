@@ -1,0 +1,108 @@
+<h1>HELLO</h1>
+
+<%= form_tag({controller: "dataextracts", action: "new"}, method: "get") do %>
+
+    <%= text_field :url , params[:url]  %>
+
+  	<%= submit_tag 'Submit url' %>
+<% end %>
+
+<%= button_to "Run comparison calculation", :action => "compare" %>
+
+<button type="button" class="plot_chart_btn">Plot chart</button>
+
+<%= render :partial => "diversitychart" %>
+
+<% Difference.all.each do |difference| %>
+
+	<p><%= Dataextract.where(:id => difference.dataextraction1).first.url %></p>
+	<p><%= difference.dataextraction1 %></p>
+	<p><%= difference.dataextraction2 %></p>
+	<p><%= number_with_precision(difference.entities_diff, :precision => 6) %></p>
+	<p><%= number_with_precision(difference.concepts_diff, :precision => 6) %></p>
+<% end %>
+
+
+<% @dataextracts.each do |p| %>
+	<% if p.entities_list.present? && p.concepts_list.present? && p.url.present? %>
+	<%= p.url %>
+
+				<% concept_array = Array.new %>
+				<% @dataextracts.each do |piece| %>
+					<p><% obj = JSON.parse(piece.concepts_list) %></p>
+					<p><% @concepts = obj['concepts'] %></p>
+					<% @concepts.each do |c| %>
+						<p><% text = c['text'] %></p>
+						<p><% concept_array.push(text) %></p>
+					<% end %>
+				<% end %>
+
+
+
+				<% concept_array %>
+				<% test_array = ['Tax haven', 'British Virgin Islands', 'text', 'text'] %>
+				<% test_array %>
+
+
+
+				<% c = @concepts.count %>
+				<% w = 30 %>
+				<% i = 30.0/c %>
+
+				<% concept_array.each do |c| %>
+					<% if test_array.include? c %>
+					EXISTS
+					<% w = w - i %>
+					<% end %>
+
+				<% end %>
+
+						<h1>----------ENTITIES---------</h1>
+
+				<% entity_array = Array.new %>
+
+				<% @dataextracts.each do |piece| %>
+					<p>----------begin--------</p>
+					<p><% obj = JSON.parse(piece.entities_list) %></p>
+
+					<p><% @entities = obj['entities'] %></p>
+
+					<% @entities.each do |e| %>
+						<p><% text = e['text'] %></p>
+						<p><% entity_array.push(text) %></p>
+
+						
+					<% end %>
+						<p>----------end---------</p>
+				<% end %>
+
+
+
+				<% entity_array %>
+				<% test_array = ['Tax haven', 'British Virgin Islands', 'text', 'text'] %>
+				<% test_array %>
+
+
+
+				<% c2 = @entities.count %>
+				<% w2 = 30 %>
+				<% i2 = 30.0/c %>
+
+				<% entity_array.each do |c| %>
+					<% if test_array.include? c %>
+					EXISTS
+					<% @@w2 = w2 - i2 %>
+					<% end %>
+
+				<% end %>
+
+
+
+						<p>ENTITY DIFFERENCE <%= number_with_precision(w, :precision => 6) %></p>
+						<p>CONCEPT DIFFERENCE <%= number_with_precision(@@w2, :precision => 6) %></p>
+					
+					
+
+
+	<% end %>
+<% end %>
