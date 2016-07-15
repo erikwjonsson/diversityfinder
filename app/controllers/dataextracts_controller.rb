@@ -106,7 +106,6 @@ class DataextractsController < ApplicationController
 	end
 
 	def rebase
-
 		if params[:dataextract].nil?
 			@rebase_id = 1
 		else
