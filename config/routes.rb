@@ -1,9 +1,14 @@
 Rails.application.routes.draw do
-  resources :dataextracts
+  resources :dataextracts do
+  end
+  resources :differences
   root 'dataextracts#index'
   get '/dataextract/new' => 'dataextracts#new'
   post '/dataextract/compare' => 'dataextracts#compare'
   post '/dataextracts/compare' => 'dataextracts#compare'
+  get '/dataextract/compare' => 'dataextracts#compare'
+
+  get '/dataextract/rebase' => 'dataextracts#rebase'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

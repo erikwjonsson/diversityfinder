@@ -1,16 +1,23 @@
 class DataextractsController < ApplicationController
 	require './alchemyapi_ruby/alchemyapi'
 	require 'json'
+	respond_to :html, :js
 
 	def index
 		@dataextracts = Dataextract.all
-		@w3 = 25
+
 					#Difference.all.each do |p|
 					#	p.destroy
 					#end
 	end
 
 	def compare
+		if params[:dataextract].nil?
+			@rebase_id = 1
+		else
+			@rebase_id = params[:dataextract].to_s[/\d+/].to_i
+		end
+
 		@dataextracts = Dataextract.all
 			@master_array = Array.new
 			@dataextracts.each do |p|
@@ -96,6 +103,24 @@ class DataextractsController < ApplicationController
 				end
 		end
 		redirect_to :controller => "dataextracts", :action => "index"
+	end
+
+	def rebase
+
+		if params[:dataextract].nil?
+			@rebase_id = 1
+		else
+			@rebase_id = params[:dataextract].to_s[/\d+/].to_i
+		end
+
+		@dataextracts = Dataextract.all
+
+    respond_to do |format|
+        format.js {
+          render :template => "dataextracts/compare.js.erb",
+          :layout => false
+        }
+    end
 	end
 
 	def new

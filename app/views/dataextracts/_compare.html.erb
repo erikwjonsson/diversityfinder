@@ -1,0 +1,56 @@
+
+<div class="chart-partial">
+
+	<% if @rebase_id.nil? %>
+		<% @rebase_id = 1 %>
+	<% else %>
+	<% end %>
+
+	<p>Article nr selected : <%= @rebase_id %></p>
+
+	<% Difference.where(:dataextraction1 => @rebase_id ).each do |diff| %>
+
+		<script>
+		$( document ).ready(function() {
+		    var x = $("#chart").position();
+
+		    topmargin =  + parseInt($("#chart").css('marginTop'), 10);
+		    leftmargin =  + parseInt($("#chart").css('marginLeft'), 10);
+
+		    topy = x.top + topmargin + 600 - '<%= diff.entities_diff %>'*20
+		    lefty = x.left + leftmargin +'<%= diff.concepts_diff %>'*20
+
+		    newcircle = $("<a href='<%= Dataextract.where(:id => diff.dataextraction2).first.url %>' target='_blank'><div class='circle'><%= Dataextract.where(:id => diff.dataextraction2).first.id %><div class='hidden-info'>HIDDEN DATA</div></div></a>");
+		    manipulate = $("#chart").append(newcircle);
+
+		    $(newcircle).css({top: topy, left: lefty, position:'absolute'});
+
+		});
+
+		</script>
+
+	<% end %>
+
+	<script>
+	$( document ).ready(function() {
+		$( ".circle" ).mouseover(function() {
+		  $( this  ).children(".hidden-info").toggle();
+		});
+	});
+	</script>
+
+	<ul class="y-axis-desc">
+		<li class="y-axis-metric1">30 (low)</li>
+		<li class="y-axis-name">Entities words<br> similarity</li>
+		<li class="y-axis-metric2">1 (high)</li>
+	</ul>
+
+	<div id="chart"></div>
+
+	<ul class="horizontal-list">
+		<li class="x-axis-metric1">1 (high)</li>
+		<li class="x-axis-name">Concepts words similarity</li>
+		<li class="x-axis-metric2">30 (low)</li>
+	</ul>
+</div>
+

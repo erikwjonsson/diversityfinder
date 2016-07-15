@@ -1,0 +1,24 @@
+$('.chart-partial').replaceWith("<%= escape_javascript(render :partial => 'compare') %>")
+
+
+<% Difference.where(:dataextraction1 => @rebase_id ).each do |diff| %>
+
+  var x = $("#chart").position();
+
+  topmargin =  + parseInt($("#chart").css('marginTop'), 10);
+  leftmargin =  + parseInt($("#chart").css('marginLeft'), 10);
+
+  topy = x.top + topmargin + 600 - '<%= diff.entities_diff %>'*20
+  lefty = x.left + leftmargin +'<%= diff.concepts_diff %>'*20
+
+  newcircle = $("<a href='<%= Dataextract.where(:id => diff.dataextraction2).first.url %>' target='_blank'><div class='circle'><%= Dataextract.where(:id => diff.dataextraction2).first.id %><div class='hidden-info'>HIDDEN DATA</div></div></a>");
+  manipulate = $("#chart").append(newcircle);
+
+  $(newcircle).css({top: topy, left: lefty, position:'absolute'});
+  
+<% end %>
+
+$( ".circle" ).mouseover(function() {
+  $( this  ).children(".hidden-info").toggle();
+});
+

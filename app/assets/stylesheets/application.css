@@ -14,11 +14,19 @@
  *= require_self
  */
 
+ul {
+	list-style-type: none;
+}
+
+.instructions-text {
+	width: 600px;
+}
 
 #chart {
-  border: 3px solid red;
+  border: 3px solid grey;
   width: 600px;
   height: 600px;
+  margin-left: 140px;
 }
 
 .circle {
@@ -30,4 +38,37 @@
 
 .hidden-info {
 	display: none;
+}
+
+.horizontal-list li {
+    display:inline;
+}
+
+.x-axis-name {
+	margin-left: 160px;
+}
+
+.x-axis-metric1 {
+	margin-left: 100px;
+}
+
+.x-axis-metric2 {
+	margin-left: 170px;
+}
+
+.y-axis-desc {
+	margin-top: 30px;
+	position: absolute;
+}
+
+.y-axis-name {
+	margin-top: 250px;
+}
+
+.y-axis-metric1 {
+	margin-top: -20px;
+}
+
+.y-axis-metric2 {
+	margin-top: 270px;
 }

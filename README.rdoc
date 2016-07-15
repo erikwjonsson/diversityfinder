@@ -26,3 +26,29 @@ Things you may want to cover:
 
 Please feel free to use a different markup language if you do not plan to run
 <tt>rake doc:app</tt>.
+
+
+
+Example URLs regarding the Panama papers.
+
+1. https://www.theguardian.com/news/2016/apr/03/the-panama-papers-how-the-worlds-rich-and-famous-hide-their-money-offshore
+
+2. http://www.wired.com/2016/04/bernie-sanders-panama-papers-told/
+
+3. http://reason.com/blog/2016/04/05/panama-papers-are-about-government-corru
+
+4. http://www.politico.com/agenda/story/2016/04/the-panama-papers-where-are-the-americans-000083
+
+5. http://www.usatoday.com/story/news/world/2016/04/06/david-cameron-edward-snowden-panama-papers/82705208/
+
+6. http://www.nytimes.com/2016/04/05/world/panama-papers-explainer.html?_r=0
+
+7. http://www.independent.co.uk/news/uk/politics/panama-papers-search-google-like-database-monday-who-is-in-a7018956.html
+
+8. https://www.yahoo.com/news/kremlin-says-sorry-goldman-sachs-german-paper-over-095251644--sector.html
+
+9. http://www.dailymail.co.uk/wires/reuters/article-3541544/Kremlin-says-sorry-Goldman-Sachs-German-paper-Panama-Papers-slip-up.html
+
+10. https://au.finance.yahoo.com/news/amid-offshore-furore-putin-says-065415873.html
+
+11. http://www.newindianexpress.com/world/Kremlin-Apologises-to-German-Paper-for-Putins-Panama-Leak-Claim/2016/04/15/article3382035.ece
