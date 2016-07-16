@@ -1,5 +1,5 @@
 class DataextractsController < ApplicationController
-	require './alchemyapi_ruby/alchemyapi'
+	require './vendor/alchemyapi_ruby/alchemyapi'
 	require 'json'
 	respond_to :html, :js
 
