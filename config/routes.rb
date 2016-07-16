@@ -7,8 +7,9 @@ Rails.application.routes.draw do
   post '/dataextract/compare' => 'dataextracts#compare'
   post '/dataextracts/compare' => 'dataextracts#compare'
   get '/dataextract/compare' => 'dataextracts#compare'
-
   get '/dataextract/rebase' => 'dataextracts#rebase'
+  get '/dataextract/insert_apikey' => 'dataextracts#insert_apikey'
+  get '/dataextract/delete_apikey' => 'dataextracts#delete_apikey'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

@@ -6,9 +6,28 @@ class DataextractsController < ApplicationController
 	def index
 		@dataextracts = Dataextract.all
 
+		api_check = File.read("api_key.txt").length
+		if api_check == 40
+			@api_key_status = 'API key present! You can now submit links!'
+		else
+			@api_key_status = 'No API key present!'
+		end
+
 					#Difference.all.each do |p|
 					#	p.destroy
 					#end
+	end
+
+	def insert_apikey
+		a = params[:api_key].to_s.gsub '["', ''
+		@user_api_key = a.gsub '"]', ''
+		File.open("api_key.txt", 'w') {|f| f.write(@user_api_key) }
+		redirect_to :controller => "dataextracts", :action => "index"
+	end
+
+	def delete_apikey
+		File.open("api_key.txt", 'w') {|f| f.write('') }
+		redirect_to :controller => "dataextracts", :action => "index"
 	end
 
 	def compare

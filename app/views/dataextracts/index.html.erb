@@ -4,9 +4,20 @@
 
 <div class="instructions-text">
 	<h2>The magic part</h2>
-	<p>This app uses IBM's Alchemy to identify concept words and entity keywords. Submitting links will not work unless you have a Alchemy API which is free to get from IBM. If you fork this app you can insert your API key into /api_key.text located in the root folder.
+	<p>This app uses IBM's Alchemy to identify concept words and entity keywords. Submitting links will not work unless you have a Alchemy API which is free to get from IBM. If you fork this app you can insert your API key into /api_key.text located in the root folder and remove the interface below. If you simply want to test the app and have an API key, insert it below.
 	</p>
 	<p>Get your free IBM Alchemy API key <a href="http://www.alchemyapi.com" target="_blank">here</a></p>
+
+	<%= form_tag({controller: "dataextracts", action: "insert_apikey"}, method: "get") do %>
+	  <%= text_field :api_key , params[:api_key], :placeholder => 'Your Alchemy API key here!'  %>
+		<%= submit_tag 'Insert API key' %>
+	<% end %>
+
+	<%= form_tag({controller: "dataextracts", action: "delete_apikey"}, method: "get") do %>
+		<%= submit_tag 'Delete API key' %>
+	<% end %>
+
+	<%= @api_key_status %>
 
 	<h2>Instructions</h2>
 	<p>Submit URLs to news articles and click "Run comparison calculation" and the chart will show you how different/similar the content of all submitted articles are from the base article's content you choose to compare to. The base article is in the bottom left.</p
