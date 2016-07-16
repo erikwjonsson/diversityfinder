@@ -20,17 +20,25 @@
 	<%= @api_key_status %>
 
 	<h2>Instructions</h2>
-	<p>Submit URLs to news articles and click "Run comparison calculation" and the chart will show you how different/similar the content of all submitted articles are from the base article's content you choose to compare to. The base article is in the bottom left.</p
+	<h3>To submit article links:</h3>
+	<p>1. Insert an IBM Alchemy API key</p>
+	<p>2. Submit URLs to news articles</p>
+	<p>3. Click "Run comparison calculation". This calculates the differences between submitted articles needed to plot them out in the chart.</p>
+	<h3>Alternate differences between articles</h3>
+	<p>1. Select an article in the Article list and click "Re-base". This uses the selected article as base point</p>
+
+	<p>The chart shows you how different/similar the content of all submitted articles are from the base article's content you choose to compare to. The base article is in the bottom left.</p>
 	<p>Each red dot is an article and the further away it is on the x-axis the more different the concept words in the article are and same for y-axis, but for entities words. </p>
 
-	<p>If you want change the base article to compare to check in the article list below and click "Re-base"</p>
-
 	<h2>Why is this useful?</h2>
-	<p>You mean except being a nice chart? You can quickly see if articles are different from the one your reading or not. If it's more of the same maybe that's interesting to you or maybe it's boring and you want some more different.
-		You can use this as a start to get data from Alchemy API and then use the calculations here to do a cluster analysis into topics and for selecting diverse content in articles to read.
-	</p>
+	<p>You mean except being a nice chart?</p>
+	<p>You can quickly see if articles are different from the one your reading or not. If it's more of the same maybe that's interesting to you or maybe it's boring and you want some more different.</p>
+	<p>You can use this as a start to get data from Alchemy API and then use the calculations here to do a cluster analysis into topics and for selecting diverse content in articles to read.</p>
 </div>
 
+<p>Made by Erik Wisalchai Jonsson</p>
+
+<p>========================================================================</p>
 
 <%= form_tag({controller: "dataextracts", action: "new"}, method: "get") do %>
   <%= text_field :url , params[:url]  %>
@@ -54,5 +62,3 @@
 	<% end %>
 	<%= submit_tag 'Re-base' %>
 <% end %>
-
-<p>Made by Erik Wisalchai Jonsson</p>
