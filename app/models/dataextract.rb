@@ -7,25 +7,29 @@ class Dataextract < ActiveRecord::Base
 		extracted_keywords_and_urls.each do |base_article_data| # Loops through each article data set to declare as base.
 			base_entities = base_article_data[1][:entities] # a base for entities keywords is chosen.
 			base_concepts = base_article_data[1][:concepts] # a base for concept keywords is chosen.
-			base_type_keywords = [base_entities, base_concepts]
+
+			Dataextract.where(:url => base_article_data[1][:url]).first.update_columns(conceptkeywords: base_concepts.to_s, entitykeywords: base_entities.to_s)
+
+			#base_type_keywords = [base_entities, base_concepts]
+			base_type_keywords = {:entities => base_entities, :concepts => base_concepts}
 
 			extracted_keywords_and_urls.each do |comparator_article_data| # Loops through each article data set to declare as comparator.
-				nr = 0
-				base_type_keywords.each do |base_type_keywords|
-					nr == 0 ? (type = 'entities') : (type = 'concepts')# UGLY
-					nr = nr + 1
+				
+				base_type_keywords.each do |type, keywords|
 					comparator_keywords = comparator_article_data[1][:"#{type}"]
 					total_weight = 30.0
 					weight_per_keyword = total_weight / comparator_keywords.count
 					self.console_output_start("#{type}", base_article_data[1][:url], base_type_keywords, comparator_article_data[1][:url], comparator_keywords, total_weight, weight_per_keyword)
-					base_type_keywords.each do |keyword| # check how many times concept keyword exists and detract weight if found.
+					
+					keywords.each do |keyword| # check how many times concept keyword exists and detract weight if found.
 						condition = comparator_keywords.include? keyword
 						condition ? (total_weight = total_weight - weight_per_keyword) : total_weight
 						condition ? (puts keyword + "   #{total_weight}") : ""
 					end
-					(self.console_output_zero(total_weight) && total_weight = 0) if total_weight < 0
-					total_weight_entities = total_weight if type == 'entities'
-					total_weight_concepts = total_weight if type == 'concepts'
+
+					(self.console_output_zero(total_weight) && total_weight = 0) if total_weight < 0 # If total weight below zero, set to zero.
+					@total_weight_entities = total_weight if type == 'entities'
+					@total_weight_concepts = total_weight if type == 'concepts'
 					self.console_output_ending(total_weight)
 				end
 
@@ -33,7 +37,7 @@ class Dataextract < ActiveRecord::Base
 				comparator_article_id = Dataextract.where(:url => comparator_article_data[1][:url]).first.id
 				if Difference.exists?(dataextraction1: base_article_id, dataextraction2: comparator_article_id) || base_article_id == comparator_article_id
 				else
-					Difference.create(dataextraction1: base_article_id, dataextraction2: comparator_article_id, entities_diff: total_weight_entities, concepts_diff: total_weight_concepts)
+					Difference.create(dataextraction1: base_article_id, dataextraction2: comparator_article_id, entities_diff: @total_weight_entities, concepts_diff: @total_weight_concepts)
 				end
 			end
 		end
@@ -123,33 +127,39 @@ class Dataextract < ActiveRecord::Base
 	end
 
 	def self.query_alchemy(url)
-		alchemyapi = AlchemyAPI.new()
-		puts "ALCHEMIST SUCCESSFUL!"
-		# ======== Concept Tagging ========
-		@keyword_entity_check = Array.new
-		@keyword_concept_check = Array.new
-		response = alchemyapi.entities('url', url, { 'sentiment'=>1 })
-		if response['status'] == 'OK'
-			@entities_list = JSON.pretty_generate(response)
-			for entity in response['entities']
-				@keyword_entity_check.push(entity['text'])
-			end
+		if Dataextract.exists?(url: url)
 		else
-			puts 'Error in entity extraction call: ' + response['statusInfo']
-		end
-
-		# ======== Concept Tagging ========
-		response = alchemyapi.concepts('url', url)
-		if response['status'] == 'OK'
-			@concepts_list = JSON.pretty_generate(response)
-			for concept in response['concepts']
-				@keyword_concept_check.push(concept['text'])
+			alchemyapi = AlchemyAPI.new()
+			# ======== Concept Tagging ========
+			@keyword_entity_check = Array.new
+			@keyword_concept_check = Array.new
+			response = alchemyapi.entities('url', url, { 'sentiment'=>1 })
+			if response['status'] == 'OK'
+				@entities_list = JSON.pretty_generate(response)
+				for entity in response['entities']
+					@keyword_entity_check.push(entity['text'])
+				end
+			else
+				puts 'Error in entity extraction call: ' + response['statusInfo']
 			end
-		else
-			puts 'Error in concept tagging call: ' + response['statusInfo']
+			# ======== Concept Tagging ========
+			response = alchemyapi.concepts('url', url)
+			if response['status'] == 'OK'
+				@concepts_list = JSON.pretty_generate(response)
+				for concept in response['concepts']
+					@keyword_concept_check.push(concept['text'])
+				end
+			else
+				puts 'Error in concept tagging call: ' + response['statusInfo']
+			end
+			if @keyword_entity_check.length != 0 && @keyword_concept_check.length != 0
+				Dataextract.create(url: url, concepts_list: @concepts_list, entities_list: @entities_list)
+			elsif @keyword_entity_check.length == 0
+				flash[:notice] = "Alchemy could not identify any ENTITY keywords. URL was not added to database!"
+			elsif @keyword_concept_check.length == 0
+				flash[:notice] = "Alchemy could not identify any CONCEPT keywords. URL was not added to database!"
+			end
 		end
-
-		return @keyword_entity_check, @keyword_concept_check, @concepts_list, @entities_list
 	end
 end
 

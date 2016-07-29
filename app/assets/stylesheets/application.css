@@ -80,3 +80,17 @@ h3 {
 .y-axis-metric2 {
 	margin-top: 270px;
 }
+
+.hidden-info {
+	background-color: rgb(197, 197, 197);
+	width: 600px;
+	padding: 10px;
+	border-radius: 5px;
+	color: black;
+	font-family: Arial;
+	font-size: 12px;
+}
+
+
+
+
