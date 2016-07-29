@@ -1,69 +1,33 @@
+require './vendor/alchemyapi_ruby/alchemyapi'
+
 class Dataextract < ActiveRecord::Base
-
-	def self.keyword_and_url_extraction # Parses the JSON strings from Alchemy stored in the database.
-		@extracted_keywords_and_urls = Hash.new
-		self.all.each do |p|
-			if p.entities_list.present? && p.concepts_list.present? && p.url.present?
-				concept_keywords = Array.new
-				#puts "REVELATOR"
-				#concepts.each {|c| (puts c['text'] + "#{c['relevance']}" )}
-				JSON.parse(p.concepts_list)['concepts'].each {|c| concept_keywords.push(c['text'])}
-				concept_keywords = concept_keywords.uniq # Read more below #1
-
-				entity_keywords = Array.new
-				JSON.parse(p.entities_list)['entities'].each {|e| entity_keywords.push(e['text'])}
-				entity_keywords = entity_keywords.uniq # Read more below #1
-				hash = Hash.new
-				hash = {:url => p.url, :entities => entity_keywords, :concepts => concept_keywords}
-				
-				@extracted_keywords_and_urls[p.id] = hash # pushes hash to master hash
-			end
-		end
-		return @extracted_keywords_and_urls
-	end
 
 	def self.comparison_calculation # Calculates the differences between all articles against all other articles based on entity and concept keywords.
 		extracted_keywords_and_urls = self.keyword_and_url_extraction
 		extracted_keywords_and_urls.each do |base_article_data| # Loops through each article data set to declare as base.
 			base_entities = base_article_data[1][:entities] # a base for entities keywords is chosen.
 			base_concepts = base_article_data[1][:concepts] # a base for concept keywords is chosen.
+			base_type_keywords = [base_entities, base_concepts]
 
 			extracted_keywords_and_urls.each do |comparator_article_data| # Loops through each article data set to declare as comparator.
-				comparator_entities = comparator_article_data[1][:entities] # a comparator for concepts keywords is chosen.
-				comparator_concepts = comparator_article_data[1][:concepts] # a comparator for entities keywords is chosen.
-
-				total_weight_concepts = 30.0
-				total_weight_entities = 30.0
-				weight_per_concept = total_weight_concepts / comparator_article_data[1][:concepts].count
-				weight_per_entitity = total_weight_entities / comparator_article_data[1][:entities].count
-
-				self.write_console_output_entities(base_article_data[1][:url], base_concepts, comparator_article_data[1][:url], comparator_concepts, total_weight_concepts, weight_per_concept)
-
-				base_concepts.each do |concept_keyword| # check how many times concept keyword exists and detract weight if found.
-					condition = comparator_concepts.include? concept_keyword
-					condition ? (total_weight_concepts = total_weight_concepts - weight_per_concept) : total_weight_concepts
-					condition ? (puts concept_keyword + "   #{total_weight_concepts}") : ""
+				nr = 0
+				base_type_keywords.each do |base_type_keywords|
+					nr == 0 ? (type = 'entities') : (type = 'concepts')# UGLY
+					nr = nr + 1
+					comparator_keywords = comparator_article_data[1][:"#{type}"]
+					total_weight = 30.0
+					weight_per_keyword = total_weight / comparator_keywords.count
+					self.console_output_start("#{type}", base_article_data[1][:url], base_type_keywords, comparator_article_data[1][:url], comparator_keywords, total_weight, weight_per_keyword)
+					base_type_keywords.each do |keyword| # check how many times concept keyword exists and detract weight if found.
+						condition = comparator_keywords.include? keyword
+						condition ? (total_weight = total_weight - weight_per_keyword) : total_weight
+						condition ? (puts keyword + "   #{total_weight}") : ""
+					end
+					(self.console_output_zero(total_weight) && total_weight = 0) if total_weight < 0
+					total_weight_entities = total_weight if type == 'entities'
+					total_weight_concepts = total_weight if type == 'concepts'
+					self.console_output_ending(total_weight)
 				end
-				if total_weight_concepts < 0
-					self.write_console_output_entities_zero(total_weight_concepts)
-					total_weight_concepts = 0
-				end
-
-				self.write_console_output_entities_ending(total_weight_concepts)
-
-				self.write_console_output_entities(base_article_data[1][:url], base_entities, comparator_article_data[1][:url], comparator_entities, total_weight_entities, weight_per_entitity)
-
-				base_entities.each do |entity_keyword| # check how many times concept keyword exists and detract weight if found.
-					condition = comparator_entities.include? entity_keyword
-					condition ? (total_weight_entities = total_weight_entities - weight_per_entitity) : total_weight_entities
-					condition ? (puts entity_keyword + "   #{total_weight_entities}") : ""
-				end
-				if total_weight_entities < 0
-					self.write_console_output_entities_zero(total_weight_entities)
-					total_weight_entities = 0
-				end
-
-				self.write_console_output_entities_ending(total_weight_entities)
 
 				base_article_id = Dataextract.where(:url => base_article_data[1][:url]).first.id
 				comparator_article_id = Dataextract.where(:url => comparator_article_data[1][:url]).first.id
@@ -75,8 +39,35 @@ class Dataextract < ActiveRecord::Base
 		end
 	end
 
-	def self.write_console_output_entities(base_article_url, base_keywords, comparator_article_url, comparator_keywords, total_weight, weight_per_keyword)
-		puts "=================== # CALCULATOR CONCEPTS # ==================="
+	def self.keyword_and_url_extraction # Parses the JSON strings from Alchemy stored in the database.
+		extracted_keywords_and_urls = Hash.new
+		self.all.each do |p|
+			if self.check_not_empty?(p) == true
+				entity_keywords = self.parse_json_for_keywords('entities', p)
+				concept_keywords = self.parse_json_for_keywords('concepts', p)
+				article_data = {:url => p.url, :entities => entity_keywords, :concepts => concept_keywords}
+				extracted_keywords_and_urls[p.id] = article_data # pushes hash to master hash
+			end
+		end
+		return extracted_keywords_and_urls
+	end
+
+	def self.parse_json_for_keywords(keyword_type, dataextract) # Valid keywordtypes: 'concepts' and 'entities'
+		#puts "REVELATOR"
+		#concepts.each {|c| (puts c['text'] + "#{c['relevance']}" )}
+		keywords = Array.new
+		JSON.parse(dataextract.send("#{keyword_type}_list"))["#{keyword_type}"].each {|e| keywords.push(e['text'])}
+		keywords = keywords.uniq # Read more below #1
+		return keywords
+	end
+
+	def self.check_not_empty?(p)
+	condition = p.entities_list.present? && p.concepts_list.present? && p.url.present?
+	condition ? (return true) : (return false)
+	end
+
+	def self.console_output_start(type, base_article_url, base_keywords, comparator_article_url, comparator_keywords, total_weight, weight_per_keyword)
+		puts "=================== # CALCULATOR #{type} # ==================="
 		puts ""
 		puts "FIRST URL"
 		puts base_article_url
@@ -105,7 +96,7 @@ class Dataextract < ActiveRecord::Base
 		puts "---------- KEYWORDS MATCHES ----------"
 	end
 
-	def self.write_console_output_entities_zero(total_weight)
+	def self.console_output_zero(total_weight)
 		puts "====== !!!!!! SUB-ZERO !!!!!! ======"
 		puts ""
 		puts total_weight
@@ -114,7 +105,7 @@ class Dataextract < ActiveRecord::Base
 		puts ""
 	end
 
-	def self.write_console_output_entities_ending(total_weight)
+	def self.console_output_ending(total_weight)
 		puts "--------------------------------------"
 		puts ""
 		puts "TOTAL WEIGHT TO INSERT: "
@@ -131,7 +122,37 @@ class Dataextract < ActiveRecord::Base
 		puts ""
 	end
 
+	def self.query_alchemy(url)
+		alchemyapi = AlchemyAPI.new()
+		puts "ALCHEMIST SUCCESSFUL!"
+		# ======== Concept Tagging ========
+		@keyword_entity_check = Array.new
+		@keyword_concept_check = Array.new
+		response = alchemyapi.entities('url', url, { 'sentiment'=>1 })
+		if response['status'] == 'OK'
+			@entities_list = JSON.pretty_generate(response)
+			for entity in response['entities']
+				@keyword_entity_check.push(entity['text'])
+			end
+		else
+			puts 'Error in entity extraction call: ' + response['statusInfo']
+		end
+
+		# ======== Concept Tagging ========
+		response = alchemyapi.concepts('url', url)
+		if response['status'] == 'OK'
+			@concepts_list = JSON.pretty_generate(response)
+			for concept in response['concepts']
+				@keyword_concept_check.push(concept['text'])
+			end
+		else
+			puts 'Error in concept tagging call: ' + response['statusInfo']
+		end
+
+		return @keyword_entity_check, @keyword_concept_check, @concepts_list, @entities_list
+	end
 end
+
 
 =begin
 
