@@ -32,7 +32,7 @@ class DataextractsController < ApplicationController
 	def new
 		# REVIEW - ALSO NEED LINKCHECKER
 		url = clean_params(params[:url])
-		Dataextract.query_alchemy(url)
+		Dataextract.create_alchemy_extract(url)
 		redirect_to :controller => "dataextracts", :action => "index"
 	end
 
@@ -43,7 +43,9 @@ private
 	end
 
   def choose_rebase_article(article_id)
-  	@rebase_id = article_id ? article_id.to_s[/\d+/].to_i : 1
+		puts "PARAMS------"
+  	@rebase_id = article_id.nil? ? 1 : article_id.to_s[/\d+/].to_i
+  	puts @rebase_id
   	return @rebase_id
   end
 
