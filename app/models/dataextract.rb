@@ -172,10 +172,10 @@ a. 	For some reason when comparing the same article againt itself it flips out i
 
 #1 Removes dublicate keywords which Alchemy might output
 
-Alchemy seems to have issues with some links. 
-It puts the exact same keyword several times, but seemt to think it is different things.
-Example https://en.wikipedia.org/wiki/Panama_Papers
-In the example Alchemy says "Mossack Fonseca" is a Person, City, Company and GeographicFeature.
+Alchemy seems to have issues with some URLs. 
+It outputs the exact same keyword several times, but seems to think the keyword is different concepts or entities.
+Example URL - https://en.wikipedia.org/wiki/Panama_Papers
+With the example URL Alchemy outputs that "Mossack Fonseca" is a Person, City, Company and GeographicFeature.
 So the keyword "Mossack Fonseca" appears four times.'
 
 SUGGESTED SOLUTION: 
