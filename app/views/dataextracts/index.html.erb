@@ -1,6 +1,6 @@
 <h1>DIVERSITY FINDER</h1>
 
-
+<p style="color: red;"><%= flash[:notice] %></p>
 
 <div class="instructions-text">
 	<h2>The magic part</h2>
@@ -52,7 +52,6 @@
 </div>
 
 <h3>Article list</h3>
-
 
 <%= form_tag({controller: "dataextracts", action: "rebase"},:remote => true, method: "get") do %>
 	<% @dataextracts.each do |dataextract| %>

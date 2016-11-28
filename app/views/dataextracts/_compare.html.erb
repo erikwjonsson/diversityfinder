@@ -1,10 +1,4 @@
-
 <div class="chart-partial">
-
-	<% if @rebase_id.nil? %>
-		<% @rebase_id = 1 %>
-	<% else %>
-	<% end %>
 
 	<p>Article nr selected : <%= @rebase_id %></p>
 
@@ -20,7 +14,7 @@
 		    topy = x.top + topmargin + 600 - '<%= diff.entities_diff %>'*20
 		    lefty = x.left + leftmargin +'<%= diff.concepts_diff %>'*20
 
-		    newcircle = $("<a href='<%= Dataextract.where(:id => diff.dataextraction2).first.url %>' target='_blank'><div class='circle'><%= Dataextract.where(:id => diff.dataextraction2).first.id %><div class='hidden-info'>HIDDEN DATA</div></div></a>");
+		    newcircle = $("<a href='<%= Dataextract.where(:id => diff.dataextraction2).first.url %>' target='_blank'><div class='circle'><%= Dataextract.where(:id => diff.dataextraction2).first.id %></a><div class='hidden-info'><% d = Dataextract.where(:id => diff.dataextraction2).first %><br><%= d.url %><br><ul><li style='font-weight:bold;'>Concept Keywords</li><% d.conceptkeywords.gsub!(/[\[\]]/,'').split(',').each do |c| %><li><%= c %></li><% end %></ul><br><ul><li style='font-weight:bold;'>Entity Keywords</li><% d.entitykeywords.gsub!(/[\[\]]/,'').split(',').each do |e| %><li><%= e %></li><% end %></ul></div></div>");
 		    manipulate = $("#chart").append(newcircle);
 
 		    $(newcircle).css({top: topy, left: lefty, position:'absolute'});
@@ -53,4 +47,3 @@
 		<li class="x-axis-metric2">30 (low)</li>
 	</ul>
 </div>
-

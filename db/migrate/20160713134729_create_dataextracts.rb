@@ -4,6 +4,8 @@ class CreateDataextracts < ActiveRecord::Migration
       t.string :url
       t.string :concepts_list
       t.string :entities_list
+      t.text :conceptkeywords
+      t.text :entitykeywords
       
       t.timestamps null: false
     end

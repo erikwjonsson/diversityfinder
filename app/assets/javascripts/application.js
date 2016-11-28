@@ -25,7 +25,7 @@ $( document ).ready(function() {
 //});
 
 
-	$( ".circle" ).mouseover(function() {
+	$( ".circle" ).hover(function() {
 	  $( this  ).children(".hidden-info").toggle();
 	});
 
