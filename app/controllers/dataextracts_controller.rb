@@ -20,7 +20,7 @@ class DataextractsController < ApplicationController
   end
 
   def compare
-    Dataextract.comparison_calculation
+    Difference.comparison_calculation
     redirect_to :controller => "dataextracts", :action => "index"
   end
 
@@ -33,6 +33,9 @@ class DataextractsController < ApplicationController
     # REVIEW - ALSO NEED LINKCHECKER
     url = clean_params(params[:url])
     Dataextract.create_alchemy_extract(url)
+
+    create_alchemy_extract
+
     redirect_to :controller => "dataextracts", :action => "index"
   end
 
