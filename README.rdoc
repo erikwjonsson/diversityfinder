@@ -3,7 +3,24 @@
 Check out the active app here:
 https://diversityfinder.herokuapp.com/dataextracts
 
-Made by Erik Wisalchai Jonsson
+
+How it works under the hood.
+- Diversityfinder's library using Alchemy's SDK queries Alchemy for machine learning output regarding URL for newspaper article.
+- Alchemy sends back JSON string with data regarding, most importantly, concept keywords and entitity keywords that is parsed.
+- Diversityfinder checks if the extracted keywords exists in other articles and detracts a weight for every time it finds a matching keywords. The lower the total weight of an article is compared to another one, the more similar they are.
+
+
+Future improvements to be made
+1. Incorporate keyword weights provided by Alchemy in difference calculation. Right now all keywords get an equal weight distribution. It should be that more relevant keywords, those with higher weights assigned by Alchemy, detracts more weight if matching another article's keywords than those keyword of lower relevance.
+Example: 
+If standard starting weight of an article is 30 and it has 30 keywords then the weight of each keywords gets a weight of 1 (30/30 = 1).
+
+"Panama papers" is a very relevant keyword(term). "Bananas" might be a less relevant keyword, but still gets listed by Alchemy.
+As it is now, if "Panama papers" is a matching keyword between two articles then 30-1=29 for the relationship between the two articles, but it is also the same 30-1=29 for "Bananas". Obviously more weight should be detracted for "Panama papers" than for "Banana".
+
+2. Remove puts statements and use logger instead.
+
+
 
 Example URLs regarding the Panama papers.
 
@@ -28,3 +45,5 @@ Example URLs regarding the Panama papers.
 10. https://au.finance.yahoo.com/news/amid-offshore-furore-putin-says-065415873.html
 
 11. http://www.newindianexpress.com/world/Kremlin-Apologises-to-German-Paper-for-Putins-Panama-Leak-Claim/2016/04/15/article3382035.ece
+
+Made by Erik Wisalchai Jonsson
